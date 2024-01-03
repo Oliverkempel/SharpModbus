@@ -1,4 +1,4 @@
-﻿namespace Disomat_Modbus.Exceptions
+﻿namespace SharpModbusLib.Exceptions
 {
     using System;
     using System.Collections.Generic;

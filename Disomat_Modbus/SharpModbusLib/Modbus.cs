@@ -1,7 +1,7 @@
-﻿namespace Disomat_Modbus
+﻿namespace SharpModbusLib
 {
-    using Disomat_Modbus.Exceptions;
-    using Disomat_Modbus.Models;
+    using SharpModbusLib.Exceptions;
+    using SharpModbusLib.Models;
     using Microsoft.Win32;
 
     using System;

@@ -1,5 +1,5 @@
 ﻿
-namespace Disomat_Modbus.Models
+namespace SharpModbusLib.Models
 {
     using System;
     using System.Collections.Generic;
