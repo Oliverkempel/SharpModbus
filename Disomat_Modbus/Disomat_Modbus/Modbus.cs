@@ -14,7 +14,7 @@
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
 
-    public class TersusModbus
+    public class Modbus
     {
         public string ipAdress { get; set; }
         public int port { get; set; }
@@ -22,7 +22,7 @@
 
         public TcpClient client = new TcpClient();
 
-        public TersusModbus(string IpAdress, int Port, byte SlaveID = 01) 
+        public Modbus(string IpAdress, int Port, byte SlaveID = 01) 
         {
             ipAdress = IpAdress;
             port = Port;
@@ -217,7 +217,7 @@
         // FUNCTION CODE: 15 - Write multiple coils
         public WriteSuccessResponse writeMultipleCoils(short startReg, bool[] values)
         {
-            short frameLength = 6;
+            //short frameLength = 6;
             byte functionCode = 15;
 
             //Flip to big Endian (i think)
@@ -235,6 +235,36 @@
 
 
             byte[] frameBytes = buildWriteMultipleFrame(startReg, bytes, Convert.ToInt16(values.Length), slaveID, functionCode);
+
+            //Inits response object
+            ModbusFrameResponse response = new ModbusFrameResponse();
+
+            //Sends frame and recieves response
+            response = sendFrame(frameBytes, Convert.ToInt16(values.Length));
+
+            return new WriteSuccessResponse { address = startReg, responseFrame = response.responseHexFrame, sentFrame = response.sentHexFrame };
+        }
+
+        // FUNCTION CODE: 15 - Write multiple coils
+        public WriteSuccessResponse writeMultipleHoldingRegisters(short startReg, Int16[] values)
+        {
+            //short frameLength = 6;
+            byte functionCode = 16;
+
+            byte[] bytes = new byte[values.Length * sizeof(Int16)];
+            Buffer.BlockCopy(values, 0, bytes, 0, values.Length * 2);
+            byte[] reversedBytes = new byte[values.Length * sizeof(Int16)];
+
+            //reverse the bytes to big endian
+            for(int i = 0; i < bytes.Length; i+=2)
+            {
+                reversedBytes[i] = bytes[i + 1];
+                reversedBytes[i + 1] = bytes[i];
+            }
+
+            byte[] frameBytes = buildWriteMultipleFrame(startReg, reversedBytes, Convert.ToInt16(values.Length), slaveID, functionCode);
+
+            string yes = BitConverter.ToString(frameBytes);
 
             //Inits response object
             ModbusFrameResponse response = new ModbusFrameResponse();
@@ -303,8 +333,6 @@
 
             byte byteCount = Convert.ToByte(writeValues.Length);
 
-            //byte[] writeValueBytes = BitConverter.GetBytes(writeValues);
-            //Array.Reverse(writeValueBytes);
 
             byte[] frameBytes = startBytes.Concat(lengthBytes).Concat(new byte[] { slaveID }).Concat(new byte[] { functionCode }).Concat(regAddressBytes).Concat(addressQuantityBytes).Concat(new byte[]{ byteCount }).Concat(writeValues).ToArray();
 

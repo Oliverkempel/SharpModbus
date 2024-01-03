@@ -56,12 +56,34 @@
 
         public static void Main(string[] args)
         {
-            //TersusModbus tersusModbus = new TersusModbus("172.31.63.217", 502);
-            TersusModbus tersusModbus = new TersusModbus("127.0.0.1", 502);
+            Modbus tersusModbus = null;
+            bool ConnSuccsselful = false;
+            do
+            {
+                try
+                {
+                    //TersusModbus tersusModbus = new TersusModbus("172.31.63.217", 502);
+                    tersusModbus = new Modbus("127.0.0.1", 502);
+                    ConnSuccsselful = true;
+                }
+                catch (Exception ex)
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine($"Connection error: {ex.Message}");
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+                if(ConnSuccsselful != true)
+                {
+                    Console.WriteLine("Press any key to try again");
+                    Console.ReadLine();
+                }
+            } while(!ConnSuccsselful);
 
-            Console.WriteLine("==================================================");
-            Console.WriteLine("             KEMPEL SIMPLE MODBUS TOOL");
-            Console.WriteLine("==================================================");
+
+
+            Console.WriteLine("================================================");
+            Console.WriteLine("                 SHARP MODBUS");
+            Console.WriteLine("================================================");
             Console.WriteLine("");
             Console.WriteLine("Select one of the following actions:");
             Console.WriteLine("1: Read holding registers (IEEE Floats)");
@@ -556,7 +578,6 @@
                 {
 
                     Int16 inputaddress = 0;
-                    short value = 0;
                     bool valid = false;
                     do
                     {
@@ -637,9 +658,92 @@
                 }
             }
 
-            //TODO 08
+            // 08 Write Multiple holding registers
+            else if (choice == 8)
+            {
+                while (true)
+                {
+
+                    Int16 inputaddress = 0;
+                    bool valid = false;
+                    do
+                    {
+                        try
+                        {
+                            Console.Write("Start coil address           :  ");
+                            inputaddress = Int16.Parse(Console.ReadLine());
+                            valid = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine($"Parse error: {ex.Message}");
+                            Console.ForegroundColor = ConsoleColor.White;
+                        }
+
+                    } while (!valid);
+
+                    valid = false;
+                    short[] valueArray = new short[0];
+                    do
+                    {
+                        try
+                        {
+
+                            Console.Write("Values (comma separated)     :  ");
+                            string inputvalue = Console.ReadLine();
+                            inputvalue.Replace(" ", "");
+
+                            string[] parts = inputvalue.Split(",");
+
+                            Array.Resize(ref valueArray, parts.Length);
+                            //bool[] array = new bool[parts.Length];
 
 
+                            for (int i = 0; i < parts.Length; i++)
+                            {
+                                valueArray[i] = Int16.Parse(parts[i]);
+                            }
+
+                            valid = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine($"Parse error: {ex.Message}");
+                            Console.ForegroundColor = ConsoleColor.White;
+                        }
+
+                    } while (!valid);
+
+
+
+                    WriteSuccessResponse? response = null;
+                    try
+                    {
+                        response = tersusModbus.writeMultipleHoldingRegisters(inputaddress, valueArray);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"ERROR: {ex.Message}");
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
+
+                    if (response != null)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine($"The holding registers have succesfully been written!");
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
+
+                    Console.WriteLine("\n");
+
+
+
+                    //tersusModbus.writeMultipleHoldingRegisters(1804, new short[] {1212, 1313, 1414});
+                }
+            }
         }
     }
 }
