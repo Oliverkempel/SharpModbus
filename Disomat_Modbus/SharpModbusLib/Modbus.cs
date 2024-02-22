@@ -14,6 +14,8 @@
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
 
+    // TODO: CHECK for empty response from tcp client
+
     public class Modbus
     {
         public string ipAdress { get; set; }
