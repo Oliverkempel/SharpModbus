@@ -352,6 +352,7 @@
 
 
             NetworkStream netStream = client.GetStream();
+            //NetworkStream netStream = new TcpClient.GetStream();
 
             netStream.Write(frame, 0, frame.Length);
 
