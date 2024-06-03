@@ -65,7 +65,8 @@
                 {
                     //TersusModbus ModbusClient = new TersusModbus("172.31.63.217", 502);
                     //ModbusClient = new Modbus("127.0.0.1", 502);
-                    ModbusClient = new Modbus("10.203.20.200", 502);
+                    //ModbusClient = new Modbus("10.203.20.200", 502);
+                    ModbusClient = new Modbus("172.31.63.220", 502);
                     ConnSuccsselful = true;
                 }
                 catch (Exception ex)
